@@ -4,8 +4,8 @@
 * 	@Version: Beta 3.0
 */
 
-//LEE EL XML **********************************************************************************************************
-//---------------------- LECTURA DEL XML ------------------------------------------------------------------------------
+/* LEE EL XML ********************************************************************************************************** 	*/
+/* ---------------------- LECTURA DEL XML ------------------------------------------------------------------------------	*/
 /*	Declaración de formatos de codificación antes de traer los datos 		*/
 mb_internal_encoding('UTF-8');
 stream_filter_register('xmlutf8', 'ValidUTF8XMLFilter');
@@ -43,16 +43,6 @@ if (!file_exists(ARCHIVO)) {
 	$xml = @simplexml_load_string(utf8_decode($xml),'SimpleXMLElement', LIBXML_NOCDATA);
 /*	****************************************************************		*/
 
-	/* 	Función preparada para armar la galería con el array que contiene las URL de las fotos	*/
-	function armarGaleria($fotos){
-		$totales 							= count($fotos);
-		for($i = 0; $i < $totales; $i++){
-			echo urldecode($fotos[$i]);
-		}
-	}
-
-	/*	Función que devuelve el último ID 		********************************************	*/
-//	echo getID();
 	/*	************************************************************************************	*/
 	$nuevoproducto							= array();
 	$editarproducto 						= array();
@@ -64,32 +54,16 @@ if (!file_exists(ARCHIVO)) {
 		$consulta = "SELECT * FROM wp_posts WHERE post_title='$pn'";
 		$resultado = mysql_query($consulta, CONEXION) or die (mysql_error());
 		$fila = mysql_fetch_array($resultado);
-		if (!$fila[0]) //Si el producto no existe, llama un instancia al funcion para crear el producto
+		if (!$fila[0]) /*Si el producto no existe, llama un instancia al funcion para crear el producto*/
 		{
 			array_push($nuevoproducto, $producto);
-		}else //Si el producto ya existe, llama un instancia al funcion para actualizar el producto
+		}else /*Si el producto ya existe, llama un instancia al funcion para actualizar el producto*/
 		{
 			array_push($editarproducto, $producto);
 		}
 	}
 
     foreach($xml->producto as $producto){
-	/*	Obteniendo las fotos para la galería
-			Se crea una variable para marcar el índice de la galería, según el xml 				*/
-		$producto_galeria 					= $producto->galeria;
-		/*	********************************************************************************	*/
-
-		/*	Se crea el array() vacío que contendrá todas las URL de las imagenes de la
-			galería por producto 																*/
-		$fotos_galeria 						= array();
-		/*	********************************************************************************	*/
-
-		/*	Se hace el ciclo que llena el array() anterior con las URL de las fotos, las
-			cuales estan codificadas para el uso correcto dentro de las funciones 				*/
-		foreach ($producto_galeria->children() as $imagen_galeria) {
-			array_push($fotos_galeria, urlencode((string)$imagen_galeria['url']));
-		}
-		/*	********************************************************************************	*/
 	/*	Convierte en un String el valor de las etiquetas xml necesarios para la tabla wp_post 	*/
 	/*	Se utiliza utf8_decode para validar las tíldes y otros caracteres en los textos donde
 		puede que los lleve, Nombre, Descripción, Características, etc.. 						*/
@@ -124,18 +98,50 @@ if (!file_exists(ARCHIVO)) {
 			'producto_imagen_destacada'		=> ($producto_imagen_destacada			= urlencode((string)$producto->imagen_destacada->imagen['url'])),
 			'fotos_galeria'					=> ($fotos_galeria)
 		);
-		/*	Se hace un llamado a la función que arma la galería por producto armarGaleria()
-			y se envía como parametro el array lleno con las URL de las imagenes 				*/
-		armarGaleria($fotos_galeria);
+		/* 	Se crea un array con los nombres de las tiendas, pasadas por utf8_decode para validar tildes 	*/
+		$nombre_tienda 						= array(
+													utf8_decode('FONTABELLA'),
+													utf8_decode('ZONA 10'),
+													utf8_decode('PLAZA FUTECA'),
+													utf8_decode('PRADERA XELA'),
+													utf8_decode('PRADERA CONCEPCION')
+											);
+		/*	************************************************************************************	*/
+		/*	Armado de la variable que contiene el HTML para el listado de existencias por tienda	*/
+		$lista_existencias					= '
+			<table class="sortable" cellpadding="0" cellspacing="0">
+				<thead><tr class="alt first last">
+					<th value="Tienda" rel="0">Tienda<span class="arrow"></span></th>
+					<th value="Existencia" rel="1">Existencia</th>
+				</tr></thead>
+				<tbody><tr class="">
+					<td value="'.$nombre_tienda[0].'">'.$nombre_tienda[0].'</td>
+					<td value="'.$productoArmado['tienda_fontabella'].'">'.$productoArmado['tienda_fontabella'].'</td>
+				</tr><tr class="alt">
+					<td value="'.$nombre_tienda[1].'">'.$nombre_tienda[1].'</td>
+					<td value="'.$productoArmado['tienda_zona10'].'">'.$productoArmado['tienda_zona10'].'</td>
+				</tr><tr class="">
+					<td value="'.$nombre_tienda[2].'">'.$nombre_tienda[2].'</td>
+					<td value="'.$productoArmado['tienda_futeca'].'">'.$productoArmado['tienda_futeca'].'</td>
+				</tr><tr class="">
+					<td value="'.$nombre_tienda[3].'">'.$nombre_tienda[3].'</td>
+					<td value="'.$productoArmado['tienda_xela'].'">'.$productoArmado['tienda_xela'].'</td>
+				</tr><tr class="alt last">
+					<td value="'.$nombre_tienda[4].'">'.$nombre_tienda[4].'</td>
+					<td value="'.$productoArmado['tienda_concepcion'].'">'.$productoArmado['tienda_concepcion'].'</td>
+				</tr></tbody>
+			</table>
+		';
+		/*	************************************************************************************	*/
+		/*	Se inserta la variable $lista_existencias al final del $productoArmado 					*/
+		$productoArmado['lista_existencias'] = $lista_existencias;
+		/*	************************************************************************************	*/
+		/*	Se envía el ProductoArmado por parámetro a la función que valida el producto 			*/
 		todosProductos($productoArmado);
-		echo $productoArmado['tienda_fontabella'];
+		/*	************************************************************************************	*/
 	}
 	include_once('query.php');
-	/*
 	add_producto($nuevoproducto);
 	edit_producto($editarproducto);
-	*/
-	// var_dump($nuevoproducto);
-	// var_dump($editarproducto);
 }
 ?>

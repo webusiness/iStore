@@ -103,10 +103,13 @@ if (!file_exists(ARCHIVO)) {
 																							(string)$producto->categoria)
 																					),
 			'producto_stock'				=> ($producto_stock 					= (int)$producto->stock),
-			//'producto_precio'				=> ($producto_precio 					= (float)$producto->precio),
-			//'producto_precio_oferta'		=> ($producto_precio_oferta 			= (float)$producto->precio_oferta),
-			'producto_precio'				=> ($producto_precio 					= number_format((double)$producto->precio, 2, '.', '')),
-			'producto_precio_oferta'		=> ($producto_precio_oferta 			= number_format((double)$producto->precio_oferta, 2 '.', '')),
+			'tienda_fontabella'				=> ($producto_tienda_fontabella 		= (int)$producto->tienda_fontabella),
+			'tienda_zona10'					=> ($producto_tienda_zona10 			= (int)$producto->tienda_zona10),
+			'tienda_futeca'					=> ($producto_tienda_futeca 			= (int)$producto->tienda_futeca),
+			'tienda_xela'					=> ($producto_tienda_xela 				= (int)$producto->tienda_xela),
+			'tienda_concepcion'				=> ($producto_tienda_concepcion 		= (int)$producto->tienda_concepcion),
+			'producto_precio'				=> ($producto_precio 					= (float)$producto->precio),
+			'producto_precio_oferta'		=> ($producto_precio_oferta 			= (float)$producto->precio_oferta),
 			'producto_alto'					=> ($producto_alto						= (float)$producto->alto),
 			'producto_ancho'				=> ($producto_ancho 					= (float)$producto->ancho),
 			'producto_longitud'				=> ($producto_longitud					= (float)$producto->longitud),
@@ -125,11 +128,13 @@ if (!file_exists(ARCHIVO)) {
 			y se envía como parametro el array lleno con las URL de las imagenes 				*/
 		armarGaleria($fotos_galeria);
 		todosProductos($productoArmado);
-		echo $productoArmado['producto_precio'];
+		echo $productoArmado['tienda_fontabella'];
 	}
 	include_once('query.php');
+	/*
 	add_producto($nuevoproducto);
 	edit_producto($editarproducto);
+	*/
 	// var_dump($nuevoproducto);
 	// var_dump($editarproducto);
 }

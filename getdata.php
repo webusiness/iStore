@@ -2,6 +2,7 @@
 /*
 *	@Uso: Carga de Datos XML para productos iStore Pro
 * 	@Version: Beta 3.0
+*	@file: getdata.php
 */
 
 /* LEE EL XML ********************************************************************************************************** 	*/

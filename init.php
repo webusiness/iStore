@@ -14,7 +14,7 @@ require_once(GET_ID);
 /*	****************************************************************		*/
 
 /*	Script que carga los datos 												*/
-define('GET_DATA', 'getdata_v3.php', true);
+define('GET_DATA', 'getdata.php', true);
 require_once(GET_DATA);
 /*	****************************************************************		*/
 

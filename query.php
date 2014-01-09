@@ -224,9 +224,10 @@
 			$simple_nom 						= str_replace(")","-", $simple_nom);
 			$simple_nom 						= str_replace(":","-", $simple_nom);
 			$nom_producto 						= strtolower($simple_nom);
+			$pn 								= $producto[$i]['producto_nombre'];
 
 			/*Busca en la tabla wp_posts si existe un producto con el mismo nombre:*/
-			$consulta 							= "SELECT * FROM wp_posts WHERE post_name = '$nom_producto'";
+			$consulta 							= "SELECT * FROM wp_posts WHERE post_title='$pn'";
 			$resultado 							= mysql_query($consulta, CONEXION) or die (mysql_error());
 			while($fila 						= mysql_fetch_array($resultado, MYSQL_BOTH)){
 				/* 	Guarda el contenido del producto en una variable */
@@ -254,6 +255,8 @@
 
 				$update_postmeta_stock 			= "UPDATE `wp_postmeta` SET `meta_value`='$elStock' WHERE `post_id`='$elID' AND `meta_key`='_stock';";
 				$inyeccion_stock				= mysql_query($update_postmeta_stock, CONEXION)or die(mysql_error());
+
+				echo $elID." = ".$producto[$i]['producto_nombre']."<br/>";
 			}
 		}
 		echo '<strong>' . count($producto) . ' Producto(s) Editados</strong> con exito!';

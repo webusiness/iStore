@@ -69,6 +69,7 @@ if (!file_exists(ARCHIVO)) {
 	/*	Se utiliza utf8_decode para validar las tíldes y otros caracteres en los textos donde
 		puede que los lleve, Nombre, Descripción, Características, etc.. 						*/
 		$productoArmado 					= array(
+			'producto_upc'					=> ($producto_upc 						= (int)$producto->upc),
 			'producto_nombre'				=> ($producto_nombre 					= utf8_decode((string)$producto->nombre)),
 			'producto_desc'					=> ($producto_desc 						= utf8_decode((string)$producto->descripcion)),
 			'producto_desc_corta'			=> ($producto_desc_corta 				= utf8_decode((string)$producto->descripcion_corta)),

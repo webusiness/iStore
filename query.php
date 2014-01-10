@@ -4,43 +4,53 @@
 * 	@Version: Beta 3.0
 *	@file: query.php
 */
+
+function limpiar($string) {
+	/*Limpia de caracteres especiales y espacios en blanco el string que sea enviado*/
+    $string = trim($string);
+    $string = str_replace(array('á', 'à', 'ä', 'â', 'ª', 'Á', 'À', 'Â', 'Ä'), array('a', 'a', 'a', 'a', 'a', 'A', 'A', 'A', 'A'), $string);
+    $string = str_replace(array('é', 'è', 'ë', 'ê', 'É', 'È', 'Ê', 'Ë'), array('e', 'e', 'e', 'e', 'E', 'E', 'E', 'E'), $string);
+    $string = str_replace(array('í', 'ì', 'ï', 'î', 'Í', 'Ì', 'Ï', 'Î'), array('i', 'i', 'i', 'i', 'I', 'I', 'I', 'I'), $string);
+    $string = str_replace(array('ó', 'ò', 'ö', 'ô', 'Ó', 'Ò', 'Ö', 'Ô'), array('o', 'o', 'o', 'o', 'O', 'O', 'O', 'O'), $string);
+    $string = str_replace(array('ú', 'ù', 'ü', 'û', 'Ú', 'Ù', 'Û', 'Ü'), array('u', 'u', 'u', 'u', 'U', 'U', 'U', 'U'), $string);
+    $string = str_replace(array('ñ', 'Ñ', 'ç', 'Ç', '-', '  '), array('n', 'N', 'c', 'C', '', ''), $string);
+    $string = str_replace(array("\\", "¨", "º", "~", "#", "@", "|", "!", "\"", "·", "$", "%", "&", "/", "(", ")", "?", "'", "¡", "¿", "[", "^", "`", "]", "+", "}", "{", "¨", "´", ">", "< ", ";", ",", ":", ".", " "), '-', $string);
+    return $string;
+}
+
 	function add_producto($producto){
 		for ($i = 0 ; $i < count($producto); $i++) {
-			/*Elimina los espacios en blanco y los reemplaza por "-" para crear el enlace permanente hacia el producto*/
-			$simple_nom 						= str_replace(" ","-", $producto[$i]["producto_nombre"]);
-			$simple_nom 						= str_replace("/","-", $simple_nom);
-			$simple_nom 						= str_replace(".","-", $simple_nom);
-			$simple_nom 						= str_replace("(","-", $simple_nom);
-			$simple_nom 						= str_replace(")","-", $simple_nom);
-			$simple_nom 						= str_replace(":","-", $simple_nom);
-			$nom_producto 						= strtolower($simple_nom);
-
+			/*Limpia de caracteres especiales y espacios en blanco el string del nombre*/
+			$nom_producto 						= strtolower(limpiar($producto[$i]["producto_nombre"]));
 			$ultimo_id 							= getID();
+
+			echo $nom_producto . "<br/>";
 
 			/*Crea un Guid para la tabla wp_post con la URL del demonio, el tipo de post y el ID del producto*/
 			$Guid 								= "http://localhost/istore/?post_type=product&#038;p=$ultimo_id";
 
 			/*Inserta el producto en la tabla WP_POST || Si el producto es nuevo sera cargado en la base de datos*/
-			$consulta 							= "INSERT INTO wp_posts VALUES (NULL, '1', NOW(), NOW(), '".$producto[$i]["producto_desc"].$producto[$i]["lista_existencias"]."', '".$producto[$i]["producto_nombre"]."', '".$producto[$i]["producto_desc_corta"]."', 'private', 'open', 'closed', '', '".$nom_producto."', '', '', NOW(), NOW(), '', '0', '".$Guid."', '0', 'product', '', '0')";
-			$respuesta 							= mysql_query($consulta, CONEXION) or die (mysql_error());
+			// $consulta 							= "INSERT INTO `wp_posts` (`ID`, `post_author`, `post_date`, `post_date_gmt`, `post_content`, `post_title`, `post_excerpt`, `post_status`, `comment_status`, `ping_status`, `post_password`, `post_name`, `to_ping`, `pinged`, `post_modified`, `post_modified_gmt`, `post_content_filtered`, `post_parent`, `guid`, `menu_order`, `post_type`, `post_mime_type`, `comment_count`) VALUES (NULL, '1', NOW(), NOW(), '".$producto[$i]["producto_desc"].$producto[$i]["lista_existencias"]."', '".$producto[$i]["producto_nombre"]."', '".$producto[$i]["producto_desc_corta"]."', 'private', 'closed', 'closed', '', '".$nom_producto."', '', '', NOW(), NOW(), '', '0', '".$Guid."', '0', 'product', '', '0')";
+			// $respuesta 							= mysql_query($consulta, CONEXION) or die (mysql_error());
 
 			/*Añade los metadatos necesarios para el producto*/
-			$consulta_insert 					= "INSERT INTO wp_postmeta (`meta_id`, `post_id`, `meta_key`, `meta_value`) VALUES (NULL, '$ultimo_id', '_manage_stock', 'yes'), (NULL, '$ultimo_id', '_backorders', 'no'), (NULL, '$ultimo_id', '_stock', '".$producto[$i]["producto_stock"]."'), (NULL, '$ultimo_id', '_sold_individually', ''), (NULL, '$ultimo_id', '_price', '".$producto[$i]["producto_precio"]."'), (NULL, '$ultimo_id', '_sale_price_dates_from', ''), (NULL, '$ultimo_id', '_sale_price_dates_to', ''), (NULL, '$ultimo_id', '_product_attributes', 'a:0:{}'), (NULL, '$ultimo_id', '_sku', ''), (NULL, '$ultimo_id', '_height', '".$producto[$i]["producto_alto"]."'), (NULL, '$ultimo_id', '_width', '".$producto[$i]["producto_ancho"]."'), (NULL, '$ultimo_id', '_length', '".$producto[$i]["producto_longitud"]."'), (NULL, '$ultimo_id', '_weight', '".$producto[$i]["producto_peso"]."'), (NULL, '$ultimo_id', '_featured', ''), (NULL, '$ultimo_id', 'purchase_note', ''), (NULL, '$ultimo_id', '_sale_price', '".$producto[$i]["producto_precio_oferta"]."'), (NULL, '$ultimo_id', '_regular_price', '".$producto[$i]["producto_precio"]."'), (NULL, '$ultimo_id', '_product_image_gallery', ''), (NULL, '$ultimo_id', '_virtual', 'no'), (NULL, '$ultimo_id', '_downloadable', 'no'), (NULL, '$ultimo_id', 'total_sales', '0'), (NULL, '$ultimo_id', '_stock_status', 'instock'), (NULL, '$ultimo_id', '_visibility', 'visible'), (NULL, '$ultimo_id', '_thumbnail_id', '')";
-			$respuesta 							= mysql_query($consulta_insert, CONEXION) or die (mysql_error());
+			// $consulta_insert 					= "INSERT INTO wp_postmeta (`meta_id`, `post_id`, `meta_key`, `meta_value`) VALUES (NULL, '$ultimo_id', '_manage_stock', 'yes'), (NULL, '$ultimo_id', '_backorders', 'no'), (NULL, '$ultimo_id', '_stock', '".$producto[$i]["producto_stock"]."'), (NULL, '$ultimo_id', '_sold_individually', ''), (NULL, '$ultimo_id', '_price', '".$producto[$i]["producto_precio"]."'), (NULL, '$ultimo_id', '_sale_price_dates_from', ''), (NULL, '$ultimo_id', '_sale_price_dates_to', ''), (NULL, '$ultimo_id', '_product_attributes', 'a:0:{}'), (NULL, '$ultimo_id', '_sku', ''), (NULL, '$ultimo_id', '_height', '".$producto[$i]["producto_alto"]."'), (NULL, '$ultimo_id', '_width', '".$producto[$i]["producto_ancho"]."'), (NULL, '$ultimo_id', '_length', '".$producto[$i]["producto_longitud"]."'), (NULL, '$ultimo_id', '_weight', '".$producto[$i]["producto_peso"]."'), (NULL, '$ultimo_id', '_featured', ''), (NULL, '$ultimo_id', 'purchase_note', ''), (NULL, '$ultimo_id', '_sale_price', '".$producto[$i]["producto_precio_oferta"]."'), (NULL, '$ultimo_id', '_regular_price', '".$producto[$i]["producto_precio"]."'), (NULL, '$ultimo_id', '_product_image_gallery', ''), (NULL, '$ultimo_id', '_virtual', 'no'), (NULL, '$ultimo_id', '_downloadable', 'no'), (NULL, '$ultimo_id', 'total_sales', '0'), (NULL, '$ultimo_id', '_stock_status', 'instock'), (NULL, '$ultimo_id', '_visibility', 'visible'), (NULL, '$ultimo_id', '_thumbnail_id', '')";
+			// $respuesta 							= mysql_query($consulta_insert, CONEXION) or die (mysql_error());
 
 			/*familia:*/
-			$simple_familia 					= strtolower(str_replace(" ","-", $producto[$i]["producto_categorias"][0]));
+			$simple_familia 					= strtolower(limpiar($producto[$i]["producto_categorias"][0]));
 
 			/*sub_familia:*/
-			$simple_sub_familia 				= strtolower(str_replace(" ","-", $producto[$i]["producto_categorias"][1]));
+			$simple_sub_familia 				= strtolower(limpiar($producto[$i]["producto_categorias"][1]));
 
 			/*Categoria*/
-			$simple_categoria 					= strtolower(str_replace(" ","-", $producto[$i]["producto_categorias"][2]));
+			$simple_categoria 					= strtolower(limpiar($producto[$i]["producto_categorias"][2]));
 
 			/*Busca en la tabla wp_terms si existe una familia con el mismo nombre:*/
 			$consulta 							= "SELECT * FROM wp_terms WHERE slug='$simple_familia'";
 			$resultado 							= mysql_query($consulta, CONEXION) or die (mysql_error());
 			$fila 								= mysql_fetch_array($resultado);
+
 			if (!$fila[0])/*#Si no existe tal familia, entonces la crea:*/
 			{
 				$consulta 						= "INSERT INTO wp_terms VALUES (NULL, '$familia', '$simple_familia', 0)";
@@ -57,7 +67,7 @@
 				$resultado 						= mysql_query($consulta, CONEXION) or die (mysql_error());
 
 				/*Relaciona al producto previamente agregado con la familia a la que pertenece.*/
-				$consulta 						= "INSERT INTO wp_term_relationships VALUES ($ultimo_id, '$id_familia', 0)";
+				$consulta 						= "INSERT INTO wp_term_relationships VALUES ('$ultimo_id', '$id_familia', 0)";
 				$resultado 						= mysql_query($consulta, CONEXION) or die (mysql_error());
 
 				/*Busca en la tabla wp_terms si existe una sub-familia con el mismo nombre:*/
@@ -206,6 +216,8 @@
 					}
 			}
 
+			/*echo "Familia: " . $simple_familia . "<br/>Sub-Familia: ".$simple_sub_familia."<br/>Categoría: ".$simple_categoria." <br/><br/>";*/
+
 		}
 		mysql_close(CONEXION);
 		if(count($producto)<1){
@@ -217,13 +229,7 @@
 
 	function edit_producto($producto){
 		for ($i = 0 ; $i < count($producto); $i++) {
-			$simple_nom 						= str_replace(" ","-", $producto[$i]["producto_nombre"]);
-			$simple_nom 						= str_replace("/","-", $simple_nom);
-			$simple_nom 						= str_replace(".","-", $simple_nom);
-			$simple_nom 						= str_replace("(","-", $simple_nom);
-			$simple_nom 						= str_replace(")","-", $simple_nom);
-			$simple_nom 						= str_replace(":","-", $simple_nom);
-			$nom_producto 						= strtolower($simple_nom);
+			$nom_producto 						= strtolower(limpiar($producto[$i]["producto_nombre"]));
 			$pn 								= $producto[$i]['producto_nombre'];
 
 			/*Busca en la tabla wp_posts si existe un producto con el mismo nombre:*/

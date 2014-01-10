@@ -1,6 +1,6 @@
 <?php
 /*	URL del xml que contiene los datos 										*/
-define('ARCHIVO', '../xml/Productos.xml', true);
+define('ARCHIVO', '../data/Productos.xml', true);
 /*	****************************************************************		*/
 
 /*	Script que carga la conexión a BD										*/
